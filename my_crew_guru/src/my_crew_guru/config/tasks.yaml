@@ -1,0 +1,18 @@
+fetch_weather:
+  description: "Get the weather forecast for the user's travel date and location"
+  agent: weather_agent
+  expected_output: "Weather details including temperature, rain, and conditions"
+  tools:
+    - WeatherAPITool
+
+suggest_packing:
+  description: "Provide clothing, accessory, and packing suggestions based on the weather"
+  agent: packing_agent
+  expected_output: "List of items to pack and travel tips"
+
+send_plan_email:
+  description: "Send the summarized travel and weather plan to the user's email"
+  agent: email_agent
+  expected_output: "Confirmation of email sent"
+  tools:
+    - EmailTool
