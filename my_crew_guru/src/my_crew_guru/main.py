@@ -1,68 +1,33 @@
 #!/usr/bin/env python
-import sys
 import warnings
-
-from datetime import datetime
-
-from my_crew_guru.crew import MyCrewGuru
+from crewai import Agent
+from crewai.utilities.prompts import Prompts
+from src.my_crew_guru.crew import TravelPlannerCrew
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
+def preview_prompt(agent: Agent):
+    prompt_generator = Prompts(
+        agent=agent,
+        has_tools=len(agent.tools) > 0,
+        use_system_prompt=agent.use_system_prompt
+    )
+    return prompt_generator.task_execution()
 
 def run():
-    """
-    Run the crew.
-    """
     inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
+        "location": "Model Town, Lahore",
+        "date": "2025-10-10"  # date required for weather tool
     }
+
+    crew = TravelPlannerCrew().crew()
     
-    try:
-        MyCrewGuru().crew().kickoff(inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+    print(preview_prompt(crew.agents[0]))
 
+    print("===========================================[ CREW RESULT ]===========================================")
+    result = crew.kickoff(inputs=inputs)
+    print(result)
+    print("===========================================[ CREW RESULT ]===========================================")
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
-    }
-    try:
-        MyCrewGuru().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
-
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        MyCrewGuru().crew().replay(task_id=sys.argv[1])
-
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
-
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
-    }
-    
-    try:
-        MyCrewGuru().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
+if __name__ == "__main__":
+    run()

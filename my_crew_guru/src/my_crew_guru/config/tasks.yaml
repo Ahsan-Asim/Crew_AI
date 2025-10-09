@@ -1,18 +1,55 @@
-fetch_weather:
+fetch_weather_task:
   description: "Get the weather forecast for the user's travel date and location"
-  agent: weather_agent
   expected_output: "Weather details including temperature, rain, and conditions"
-  tools:
-    - WeatherAPITool
+  agent: weather_agent
+  input_mapping:
+    location: "location"  # corrected
+    date: "date"          # corrected
+  output:
+    type: dict
+    description: "Dictionary containing forecast string"
+    agent: weather_agent
+    properties:
+      forecast:
+        type: str
+        description: "Weather forecast for the trip"
+        agent: weather_agent
 
-suggest_packing:
+
+
+suggest_packing_task:
   description: "Provide clothing, accessory, and packing suggestions based on the weather"
-  agent: packing_agent
   expected_output: "List of items to pack and travel tips"
+  agent: packing_agent
+  context:
+    - fetch_weather_task
+  output:
+    type: dict
+    description: "Dictionary containing packing tips"
+    agent: packing_agent      # ⚠️ required at top level
+    properties:
+      packing_tips:
+        type: str
+        description: "Packing tips for the trip"
+        agent: packing_agent
 
-send_plan_email:
+send_email_task:
   description: "Send the summarized travel and weather plan to the user's email"
-  agent: email_agent
   expected_output: "Confirmation of email sent"
-  tools:
-    - EmailTool
+  agent: email_agent
+  context:
+    - fetch_weather_task
+    - suggest_packing_task
+  input_mapping:
+    location: "location"                   # top-level kickoff input
+    forecast: "fetch_weather_task.forecast"
+    packing_tips: "suggest_packing_task.packing_tips"
+  output:
+    type: dict
+    description: "Dictionary containing confirmation"
+    agent: email_agent
+    properties:
+      confirmation:
+        type: str
+        description: "Confirmation message of email sent"
+        agent: email_agent

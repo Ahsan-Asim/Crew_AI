@@ -2,14 +2,9 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
-from pydantic import BaseModel
 
 from tools.weather_tool import WeatherTool
 from tools.email_tool import EmailTool
-
-class TravelPlan(BaseModel):
-    forecast: str
-    packing_tips: str
 
 @CrewBase
 class TravelPlannerCrew:
